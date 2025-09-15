@@ -6,10 +6,11 @@
     list-style: none;
     padding: 0;
     margin: 0;
+    margin-right: 130px;
 }
 
 .pagination li {
-    border: 1px solid #dee2e6;
+    border: 1px solid #97999c;
     border-radius: 4px;
     cursor: pointer;
     min-width: 36px;
@@ -30,6 +31,10 @@
 
 .pagination li:hover {
     background-color: #e9ecef;
+    box-shadow:
+        0 0 10px rgba(13, 109, 253, 0.647),
+        inset 0 0 10px rgba(13, 109, 253, 0.2),
+        0 0 10px rgba(13, 0, 255, 0.3);
 }
 
 .pagination li.active:hover {
@@ -44,4 +49,16 @@
 .active a {
     color: #fff !important;
     font-weight: 500;
+}
+
+.disabled {
+    pointer-events: none;
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.disabled:hover {
+    background-color: inherit;
+    box-shadow: none;
+    opacity: 0.3;
 }

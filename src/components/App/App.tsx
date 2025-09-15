@@ -1,35 +1,81 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import Loader from "../Loader/Loader";
+import { useNotes } from "../../hooks/useNotes";
+import { toast, ToastContainer } from "react-toastify";
+import css from "./App.module.css";
+// import { ToastContainer } from "react-hot-toast";
+import SearchBox from "../SearchBox/SearchBox";
+import Modal from "../Modal/Modal";
+import NoteForm from "../NoteForm/NoteForm";
+import ErrorMessage from "../ErrorMessage/ErrorMessage";
+import NoteList from "../NoteList/NoteList";
+import Pagination from "../Pagination/Pagination";
+// import { useDebounce } from "use-debounce";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [isOpenModal, setIsOpenModal] = useState(false);
+  // const [debouncedSearch] = useDebounce(search, 300);
+
+  const { data, isLoading, isError, isSuccess } = useNotes(page);
+  const filteredNotes = (data?.notes ?? []).filter(
+    (note) =>
+      note.title.toLowerCase().includes(search.toLowerCase()) ||
+      note.content.toLowerCase().includes(search.toLowerCase())
+  );
+  useEffect(() => {
+    if (isSuccess && filteredNotes.length === 0 && search.trim()) {
+      toast.error("No notes found for your request.");
+    }
+  }, [filteredNotes, isSuccess, search]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search]);
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className={css.app}>
+        <ToastContainer
+          theme="auto"
+          position="bottom-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+        <header className={css.toolbar}>
+          <SearchBox value={search} onChange={(val) => setSearch(val)} />
+          {isSuccess && filteredNotes.length > 0 && data?.totalPages > 1 && (
+            <Pagination
+              totalPages={data.totalPages ?? 0}
+              page={page}
+              setPage={(newPage) => setPage(newPage)}
+            />
+          )}
+
+          <button className={css.button} onClick={() => setIsOpenModal(true)}>
+            Create note
+          </button>
+          {isOpenModal && (
+            <Modal onClose={() => setIsOpenModal(false)}>
+              <NoteForm onClose={() => setIsOpenModal(false)} />
+            </Modal>
+          )}
+        </header>
+        {isLoading && <Loader />}
+        {isError && <ErrorMessage />}
+        {isSuccess && filteredNotes?.length > 0 && (
+          <NoteList notes={filteredNotes} />
+        )}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
