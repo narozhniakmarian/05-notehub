@@ -1,5 +1,4 @@
 // npm i framer-motion
-import React from "react";
 import { motion } from "framer-motion";
 import css from "./Loader.module.css";
 
