@@ -3,12 +3,9 @@ import type { Note, NotePost } from "../types/note";
 
 const BASE_URL = "https://notehub-public.goit.study/api/notes";
 const API_TOKEN = import.meta.env.VITE_NOTEHUB_API_KEY;
-export interface FetchProps {
+export interface NotesResponse {
   notes: Note[];
   totalPages: number;
-}
-export interface FetchCreate {
-  notePost: NotePost;
 }
 
 const buildFetchConfig = (params?: Record<string, string | number>) => ({
@@ -22,14 +19,14 @@ async function noteFetch(
   search: string,
   page: number,
   perPage = 16
-): Promise<FetchProps> {
-  const params: Record<string, string | number> = { page, perPage };
+): Promise<NotesResponse> {
+  const params: Record<string, string | number> = { page, perPage, search };
   if (search.trim()) {
     params.search = search.trim();
   }
 
-  const response = await axios.get<FetchProps>(BASE_URL, {
-    params: { page, perPage: 16 },
+  const response = await axios.get<NotesResponse>(BASE_URL, {
+    params: { page, perPage: 16, search },
     headers: {
       accept: "application/json",
       Authorization: `Bearer ${API_TOKEN}`,

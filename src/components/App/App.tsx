@@ -10,29 +10,33 @@ import NoteForm from "../NoteForm/NoteForm";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import NoteList from "../NoteList/NoteList";
 import Pagination from "../Pagination/Pagination";
-// import { useDebounce } from "use-debounce";
+import { useDebounce } from "use-debounce";
 
 function App() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [isOpenModal, setIsOpenModal] = useState(false);
-  // const [debouncedSearch] = useDebounce(search, 300);
+  const [debouncedSearch] = useDebounce(search, 300);
 
-  const { data, isLoading, isError, isSuccess } = useNotes(page);
-  const filteredNotes = (data?.notes ?? []).filter(
-    (note) =>
-      note.title.toLowerCase().includes(search.toLowerCase()) ||
-      note.content.toLowerCase().includes(search.toLowerCase())
+  const { data, isLoading, isError, isSuccess } = useNotes(
+    page,
+    debouncedSearch
   );
+  const notes = data?.notes ?? [];
+
   useEffect(() => {
-    if (isSuccess && filteredNotes.length === 0 && search.trim()) {
+    if (
+      isSuccess &&
+      (data?.notes?.length ?? 0) === 0 &&
+      debouncedSearch.trim()
+    ) {
       toast.error("No notes found for your request.");
     }
-  }, [filteredNotes, isSuccess, search]);
+  }, [data?.notes, isSuccess, debouncedSearch]);
 
   useEffect(() => {
     setPage(1);
-  }, [search]);
+  }, [debouncedSearch]);
 
   return (
     <>
@@ -51,7 +55,7 @@ function App() {
         />
         <header className={css.toolbar}>
           <SearchBox value={search} onChange={(val) => setSearch(val)} />
-          {isSuccess && filteredNotes.length > 0 && data?.totalPages > 1 && (
+          {isSuccess && notes.length > 0 && data?.totalPages > 1 && (
             <Pagination
               totalPages={data.totalPages ?? 0}
               page={page}
@@ -70,9 +74,7 @@ function App() {
         </header>
         {isLoading && <Loader />}
         {isError && <ErrorMessage />}
-        {isSuccess && filteredNotes?.length > 0 && (
-          <NoteList notes={filteredNotes} />
-        )}
+        {isSuccess && notes?.length > 0 && <NoteList notes={notes} />}
       </div>
     </>
   );

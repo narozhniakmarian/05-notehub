@@ -23,7 +23,7 @@ export default function NoteForm({ onClose }: NoteFormProps) {
     mutationFn: async (newNote: NotePost) => await createNote(newNote),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["noteHubKey"] });
-      console.log("toast.successYour note added successfully");
+      onClose?.();
       toast.success("Your note added successfully");
     },
   });
@@ -31,12 +31,11 @@ export default function NoteForm({ onClose }: NoteFormProps) {
   const handleSubmit = (values: NotePost, actions: FormikHelpers<NotePost>) => {
     mutation.mutate(values);
     actions.resetForm();
-    onClose?.();
   };
 
   const CreateNoteFormSchema = Yup.object().shape({
-    title: Yup.string().min(3).max(30).required(),
-    content: Yup.string().max(700),
+    title: Yup.string().min(3).max(50).required(),
+    content: Yup.string().max(500),
     tag: Yup.string()
       .oneOf(["Todo", "Work", "Personal", "Meeting", "Shopping"])
       .required(),

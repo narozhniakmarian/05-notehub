@@ -2,12 +2,12 @@ import type React from "react";
 import { useDebouncedCallback } from "use-debounce";
 import css from "./SearchBox.module.css";
 
-interface SearchProps {
+interface SearchBoxProps {
   value: string;
   onChange: (value: string) => void;
 }
 
-const SearchBox = ({ value, onChange }: SearchProps) => {
+const SearchBox = ({ value, onChange }: SearchBoxProps) => {
   const debouncedChange = useDebouncedCallback((value: string) => {
     onChange(value);
   }, 100);
