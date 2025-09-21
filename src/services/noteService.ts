@@ -32,7 +32,8 @@ async function noteFetch(
       Authorization: `Bearer ${API_TOKEN}`,
     },
   });
-
+console.log(response.data);
+  console.log(API_TOKEN);
   return response.data;
 }
 
